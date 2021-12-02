@@ -60,9 +60,45 @@ exports.login = async (request, response, next) => {
     
 }
 
-exports.forgotPassword = (request, response, next) => {
+exports.forgotPassword = async (request, response, next) => {
 
-    response.send("ForgotPassword Route");
+    const { email } = request.body;
+
+    try {
+
+        const user = await User.findOne({ email });
+
+        if (!user) {
+
+            return next(new errorResponse("Email could not be synced"), 404);
+
+        } 
+
+        const requestToken = user.resetPasswordToken();
+        await user.save();
+
+        const resetUrl = `http://localhost:3000/passwordreset/${resetToken}`;
+
+        const message = `
+
+            <h1>You have requested a new password reset</h1>
+            <p>Please go to this link to reset your password</p>
+            <a href=${resetUrl} clicktracking=off>${resetUrl}</a>
+        `
+
+        try {
+
+            
+
+        } catch (err) {
+
+
+        }
+
+    } catch (err) {
+
+
+    }
 }
 
 exports.resetPassword = (request, response, next) => {
