@@ -4,12 +4,38 @@ const errorResponse = require("../utils/errorResponse");
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
 const ErrorResponse = require("../utils/errorResponse");
+var pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/; 
 
 exports.register = async (request, response, next) => {
 
     const { username, email, password } = request.body;
 
+    
     try {
+
+        if (email.match(pattern) == null) {
+
+            return next(new errorResponse("Email does not exist", 400, 1));
+
+        }
+
+        if (username === "") {
+
+            return next(new errorResponse("You need to provide a username", 400, 1));
+
+        }
+
+        if (password.length < 6) {
+
+            return next(new errorResponse("Password needs to be 6 characters", 400, 1));
+        }
+
+        const user1 = await User.findOne({ username });
+
+        if (user1) {
+
+            return next(new errorResponse("Username already taken", 401, 2));
+        }
 
         const user = await User.create({
             username, email, password
@@ -19,7 +45,7 @@ exports.register = async (request, response, next) => {
 
     } catch (err) {
 
-        next(err);
+        next(err.subject);
     }
     
 }
@@ -31,7 +57,7 @@ exports.login = async (request, response, next) => {
 
     if (!email || !password) {
 
-        return next(new errorResponse("Please provide an email and password", 400));
+        return next(new errorResponse("Please provide an email and password", 400, 3));
     }
 
     try {
@@ -40,7 +66,7 @@ exports.login = async (request, response, next) => {
 
         if (!user) {
 
-        return next(new errorResponse("Invalid credentials", 401));
+        return next(new errorResponse("Invalid credentials", 401, 4));
            
         }
 
@@ -48,7 +74,7 @@ exports.login = async (request, response, next) => {
 
         if(!isMatch) {
 
-            return next(new errorResponse("Invalid credentials", 401));
+            return next(new errorResponse("Invalid credentials", 401, 5));
 
         }
 
@@ -73,7 +99,7 @@ exports.forgotPassword = async (request, response, next) => {
 
         if (!user) {
 
-            return next(new errorResponse("Email could not be synced"), 404);
+            return next(new errorResponse("Email could not be synced"), 404, 6);
 
         } 
 
@@ -111,7 +137,7 @@ exports.forgotPassword = async (request, response, next) => {
 
             await user.save();
 
-            return next(new errorResponse("Email could not be synced", 500));
+            return next(new errorResponse("Email could not be synced", 500, 7));
 
         }
 
@@ -138,7 +164,7 @@ exports.resetPassword = async (request, response, next) => {
         console.log(user);
         if (!user) {
 
-            return next(new ErrorResponse("invalid reset token", 400));
+            return next(new ErrorResponse("invalid reset token", 400, 8));
         }
 
         user.password = request.body.password;

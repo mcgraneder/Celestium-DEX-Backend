@@ -11,13 +11,13 @@ const errorHandler = (err, request, response, next) => {
     if (err.code === 1100) {
 
         const message = `Duplicate field value enetered`;
-        error = new errorResponse(message, 400);
+        error = new errorResponse(message, 400, 12);
     }
 
     if (error.name === `ValidationError`) {
 
         const message = Object.values(err.errors).map((value) => value.message);
-        error = new errorResponse(message, 400);
+        error = new errorResponse(message, 400, 13);
     }
 
     response.status(error.statusCode || 500).json({

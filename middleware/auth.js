@@ -13,7 +13,7 @@ exports.protect = async(request, response, next) => {
 
     if (!token) {
 
-        return next(new errorResponse("not authorized to access this route", 401));
+        return next(new errorResponse("not authorized to access this route", 401, 9));
     }
 
     try {
@@ -24,7 +24,7 @@ exports.protect = async(request, response, next) => {
 
         if (!user) {
 
-            return next(new errorResponse("No user found with this ID", 404));
+            return next(new errorResponse("No user found with this ID", 404, 10));
         }
 
         request.user = user;
@@ -33,6 +33,6 @@ exports.protect = async(request, response, next) => {
 
     } catch (err) {
 
-        return next(new errorResponse("not authorized to access this route", 401));
+        return next(new errorResponse("not authorized to access this route", 401, 11));
     }
 }
