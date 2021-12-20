@@ -4,44 +4,60 @@ const errorResponse = require("../utils/errorResponse");
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
 const ErrorResponse = require("../utils/errorResponse");
+const { recoverPersonalSignature } = require("eth-sig-util");
+const  { bufferToHex, Address } = require("ethereumjs-util");
+
 var pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/; 
 
 exports.register = async (request, response, next) => {
 
-    const { username, email, password } = request.body;
-
+    var { signature, nonce, publicAddress, username, email, password } = request.body;
+    // nonce = 1111;
+    console.log("the signature is ", publicAddress);
     
     try {
 
-        if (email.match(pattern) == null) {
+        // if (email.match(pattern) == null) {
 
-            return next(new errorResponse("Email does not exist", 400, 1));
+        //     return next(new errorResponse("Email does not exist", 400, 1));
 
-        }
+        // }
 
-        if (username === "") {
 
-            return next(new errorResponse("You need to provide a username", 400, 1));
 
-        }
+        const msg = `Alpha-Baetrum Onboarding unique one-time nonce: ${nonce} by signimg this you are verifying your ownership of this wallet`;
+        // console.log("the nonce is ". 1111);
+       
 
-        if (password.length < 6) {
+				// We now are in possession of msg, publicAddress and signature. We
+				// will use a helper from eth-sig-util to extract the address from the signature
+		const msgBufferHex = bufferToHex(Buffer.from(msg, 'utf8'));
+		const address = recoverPersonalSignature({data: msgBufferHex, sig: signature.signature});
+        console.log("the address is", msg);
 
-            return next(new errorResponse("Password needs to be 6 characters", 400, 1));
-        }
+                
 
-        const user1 = await User.findOne({ username });
+				// The signature verification is successful if the address found with
+				// sigUtil.recoverPersonalSignature matches the initial publicAddress
+        // console.log("the address is",publicAddress);
+		if (address.toLowerCase() === publicAddress.toLowerCase()) {
 
-        if (user1) {
+            
+			const user = await User.create({
+                nonce, publicAddress, username, email, password
+            })
 
-            return next(new errorResponse("Username already taken", 401, 2));
-        }
+            user.nonce =Math.floor(Math.random() * 10000);
+            user.save();
+            sendToken(user, 200, response);
+            
+		} else {
+			res.status(401).send({
+				error: 'Signature verification failed',
+			});
 
-        const user = await User.create({
-            username, email, password
-        })
-
-        sendToken(user, 200, response);
+			// return null;
+		}
 
     } catch (err) {
 
@@ -52,9 +68,10 @@ exports.register = async (request, response, next) => {
 
 exports.login = async (request, response, next) => {
 
-    const { email, password } = request.body;
-    console.log(email)
+    const { signature, nonce, publicAddress, email, password } = request.body;
+    console.log("my nonnnceee is", nonce)
 
+    const user = await User.findOne({ email }).select("+password");
     if (!email || !password) {
 
         return next(new errorResponse("Please provide an email and password", 400, 3));
@@ -62,23 +79,33 @@ exports.login = async (request, response, next) => {
 
     try {
 
-        const user = await User.findOne({ email }).select("+password");
+        
 
-        if (!user) {
+        const msg = `Alpha-Baetrum Onboarding unique one-time nonce: ${nonce} by signimg this you are verifying your ownership of this wallet`;
+        // console.log("the nonce is ". 1111);
+       
 
-        return next(new errorResponse("Invalid credentials", 401, 4));
-           
-        }
+				// We now are in possession of msg, publicAddress and signature. We
+				// will use a helper from eth-sig-util to extract the address from the signature
+		const msgBufferHex = bufferToHex(Buffer.from(msg, 'utf8'));
+		const address = recoverPersonalSignature({data: msgBufferHex, sig: signature.signature});
+        console.log("the address is", msg);
 
-        const isMatch = await user.matchPasswords(password);
+                
 
-        if(!isMatch) {
+				// The signature verification is successful if the address found with
+				// sigUtil.recoverPersonalSignature matches the initial publicAddress
+        // console.log("the address is",publicAddress);
+		if (address.toLowerCase() === publicAddress.toLowerCase()) {
+            
+            sendToken(user, 200, response);
+		} else {
+			res.status(401).send({
+				error: 'Signature verification failed',
+			});
 
-            return next(new errorResponse("Invalid credentials", 401, 5));
-
-        }
-
-        sendToken(user, 201, response);
+			// return null;
+		}
 
         
     } catch(err) {

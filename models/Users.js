@@ -5,6 +5,17 @@ const jwt = require("jsonwebtoken");
 
 const UserSchema = new mongoose.Schema({
 
+    nonce: {
+        allowNull: false,
+        type: Number, // SQLITE will use INTEGER
+        defaultValue: Math.floor(Math.random() * 10000), // Initialize with a random nonce
+    },
+    publicAddress: {
+        allowNull: false,
+        type: String,
+        unique: true,
+    },
+
     username: {
         type: String, 
         minLength: 4,
