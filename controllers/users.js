@@ -79,9 +79,11 @@ exports.getUserNonce = async (request, response, next) => {
     var { publicAddress, email, password } = request.body;
     
     publicAddress = publicAddress.toLowerCase()
-    const found = await User.findOne({ publicAddress });
+    const found = await User.findOne({ email });
 
-    if (!found) {
+    // console.log("adddddd", found.publicAddress, publicAddress)
+    
+    if (found.publicAddress.toLowerCase() != publicAddress.toLowerCase()) {
 
         return next(new errorResponse("Wallet address not registered. Please Sign Up", 400, 1));
     }
@@ -112,11 +114,41 @@ exports.getUserNonce = async (request, response, next) => {
         }
 
     const nonce = found.nonce;
-    user.nonce =Math.floor(Math.random() * 10000);
-    user.save();
+
 
     response.status(200).json({ 
         success: true,
         nonce: nonce
+    })
+}
+
+exports.getUser = async (request, response, next) => {
+
+    // response.status(200).json({
+    //     success: true,
+    //     data: "you got access to the private data in this route"
+    // })
+    var { publicAddress } = request.body;
+    
+    // publicAddress = publicAddress.toLowerCase()
+    const found = await User.findOne({ publicAddress});
+
+    console.log("adddddd", found.publicAddress, publicAddress)
+    
+    if (found == null || undefined) {
+
+        response.status(200).json({ 
+            success: false,
+            address: ""
+           
+        })
+
+    }
+
+
+    response.status(200).json({ 
+        success: true,
+        address: publicAddress
+       
     })
 }

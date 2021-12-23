@@ -99,6 +99,7 @@ exports.login = async (request, response, next) => {
 		if (address.toLowerCase() === publicAddress.toLowerCase()) {
             
             sendToken(user, 200, response);
+            
 		} else {
 			res.status(401).send({
 				error: 'Signature verification failed',
