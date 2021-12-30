@@ -71,6 +71,8 @@ exports.login = async (request, response, next) => {
     const { signature, nonce, publicAddress, email, password } = request.body;
     console.log("my nonnnceee is", nonce)
 
+    console.log(publicAddress[0])
+
     const user = await User.findOne({ email }).select("+password");
     if (!email || !password) {
 
@@ -101,7 +103,7 @@ exports.login = async (request, response, next) => {
             sendToken(user, 200, response);
             
 		} else {
-			res.status(401).send({
+			response.status(401).send({
 				error: 'Signature verification failed',
 			});
 

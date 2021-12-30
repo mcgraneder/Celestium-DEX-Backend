@@ -12,7 +12,7 @@ const UserSchema = new mongoose.Schema({
     },
     publicAddress: {
         allowNull: false,
-        type: String,
+        type: Array,
         unique: true,
     },
 

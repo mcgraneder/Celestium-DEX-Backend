@@ -83,7 +83,7 @@ exports.getUserNonce = async (request, response, next) => {
 
     // console.log("adddddd", found.publicAddress, publicAddress)
     
-    if (found.publicAddress.toLowerCase() != publicAddress.toLowerCase()) {
+    if (found.publicAddress[0].toLowerCase() != publicAddress.toLowerCase()) {
 
         return next(new errorResponse("Wallet address not registered. Please Sign Up", 400, 1));
     }
@@ -151,4 +151,75 @@ exports.getUser = async (request, response, next) => {
         address: publicAddress
        
     })
+}
+
+exports.getUserAddress = async (request, response, next) => {
+
+    var { publicAddress } = request.body;
+    
+    publicAddress = publicAddress.toLowerCase()
+    await User.findOne({publicAddress}).then((data, err) => {
+
+        if (data == null) {
+
+            console.log("err")
+            return next(new errorResponse("Wallet Address not registered", 401, 2));
+        }
+        console.log("Data", data)
+        response.status(200).json({ 
+            success: true,
+            address: publicAddress,
+            email: data.email
+           
+        })
+    })
+}
+
+exports.updateUserAddress = async(request, response, next) => {
+
+    var { publicAddress, email } = request.body;
+
+    // var email = "mcgrane480@gmail.com"
+    // var publicAddress = "0x3330e78dD15784e0DEc11146b5238F8C21043fea"
+    publicAddress = publicAddress.toLowerCase()
+    const user = await User.findOne({ email });
+
+    try {
+
+        const msg = `Alpha-Baetrum Onboarding unique one-time nonce: ${nonce} by signimg this you are verifying your ownership of this wallet`;
+		const msgBufferHex = bufferToHex(Buffer.from(msg, 'utf8'));
+		const address = recoverPersonalSignature({data: msgBufferHex, sig: signature.signature});
+        console.log("the address is", msg);
+
+		if (address.toLowerCase() === publicAddress.toLowerCase()) {
+
+            
+			const user = await User.create({
+                nonce, publicAddress, username, email, password
+            })
+
+            user.nonce =Math.floor(Math.random() * 10000);
+            user.publicAddress.push(publicAddress);
+            user.save();
+
+            console.log(user);
+
+            response.status(200).json({ 
+                success: true,
+                address: publicAddress
+       
+            })
+            
+		} else {
+			res.status(401).send({
+				error: 'Signature verification failed',
+			});
+
+			// return null;
+		}
+
+    } catch (err) {
+
+        next(err.subject);
+    }
 }
