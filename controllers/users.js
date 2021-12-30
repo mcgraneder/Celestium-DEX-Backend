@@ -2,6 +2,8 @@ const User = require("../models/Users")
 const { response } = require("express");
 const errorResponse = require("../utils/errorResponse");
 const ErrorResponse = require("../utils/errorResponse");
+const { recoverPersonalSignature } = require("eth-sig-util");
+const  { bufferToHex, Address } = require("ethereumjs-util");
 
 
 exports.getUserData = async (request, response, next) => {
@@ -79,11 +81,11 @@ exports.getUserNonce = async (request, response, next) => {
     var { publicAddress, email, password } = request.body;
     
     publicAddress = publicAddress.toLowerCase()
-    const found = await User.findOne({ email });
+    const found = await User.findOne({ publicAddress });
 
-    // console.log("adddddd", found.publicAddress, publicAddress)
+    console.log("adddddd", found)
     
-    if (found.publicAddress[0].toLowerCase() != publicAddress.toLowerCase()) {
+    if (!found) {
 
         return next(new errorResponse("Wallet address not registered. Please Sign Up", 400, 1));
     }
@@ -177,13 +179,13 @@ exports.getUserAddress = async (request, response, next) => {
 
 exports.updateUserAddress = async(request, response, next) => {
 
-    var { publicAddress, email } = request.body;
+    var { signature, nonce, publicAddress, email } = request.body;
 
     // var email = "mcgrane480@gmail.com"
     // var publicAddress = "0x3330e78dD15784e0DEc11146b5238F8C21043fea"
     publicAddress = publicAddress.toLowerCase()
     const user = await User.findOne({ email });
-
+    console.log(user)
     try {
 
         const msg = `Alpha-Baetrum Onboarding unique one-time nonce: ${nonce} by signimg this you are verifying your ownership of this wallet`;
@@ -193,10 +195,6 @@ exports.updateUserAddress = async(request, response, next) => {
 
 		if (address.toLowerCase() === publicAddress.toLowerCase()) {
 
-            
-			const user = await User.create({
-                nonce, publicAddress, username, email, password
-            })
 
             user.nonce =Math.floor(Math.random() * 10000);
             user.publicAddress.push(publicAddress);
@@ -222,4 +220,19 @@ exports.updateUserAddress = async(request, response, next) => {
 
         next(err.subject);
     }
+}
+
+exports.getNonce = async (request, response, next) => {
+
+    const { email } = request.body;
+
+    await User.findOne({email}).then((data) => {
+
+        console.log("Data", data)
+        response.status(200).json({ 
+            success: true,
+            nonce: data.nonce
+   
+        })
+    })
 }
