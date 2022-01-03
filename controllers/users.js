@@ -27,6 +27,7 @@ exports.FindAddress = async (request, response, next) => {
     // })
     var { publicAddress, username, email, password } = request.body;
     console.log(publicAddress)
+    console.log(publicAddress)
     publicAddress = publicAddress.toLowerCase()
     const found = await User.findOne({ publicAddress });
     console.log(found)
