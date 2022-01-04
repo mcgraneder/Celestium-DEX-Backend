@@ -64,7 +64,7 @@ exports.register = async (request, response, next) => {
     //     next(err.subject);
     // }
 
-    response.status(statusCode).json({ 
+    response.status(200).json({ 
         success: true,
     
     })
