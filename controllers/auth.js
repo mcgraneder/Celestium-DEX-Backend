@@ -11,63 +11,62 @@ var pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\
 
 exports.register = async (request, response, next) => {
 
-    // var { signature, nonce, publicAddress, username, email, password } = request.body;
-    // // nonce = 1111;
-    // console.log("the signature is ", publicAddress);
+    var { signature, nonce, publicAddress, username, email, password } = request.body;
+    // nonce = 1111;
+    console.log("the signature is ", publicAddress);
     
-    // try {
+    try {
 
-    //     // if (email.match(pattern) == null) {
+        // if (email.match(pattern) == null) {
 
-    //     //     return next(new errorResponse("Email does not exist", 400, 1));
+        //     return next(new errorResponse("Email does not exist", 400, 1));
 
-    //     // }
+        // }
 
 
 
-    //     const msg = `Alpha-Baetrum Onboarding unique one-time nonce: ${nonce} by signimg this you are verifying your ownership of this wallet`;
-    //     // console.log("the nonce is ". 1111);
+        const msg = `Alpha-Baetrum Onboarding unique one-time nonce: ${nonce} by signimg this you are verifying your ownership of this wallet`;
+        // console.log("the nonce is ". 1111);
        
 
-	// 			// We now are in possession of msg, publicAddress and signature. We
-	// 			// will use a helper from eth-sig-util to extract the address from the signature
-	// 	const msgBufferHex = bufferToHex(Buffer.from(msg, 'utf8'));
-	// 	const address = recoverPersonalSignature({data: msgBufferHex, sig: signature.signature});
-    //     console.log("the address is", msg);
+				// We now are in possession of msg, publicAddress and signature. We
+				// will use a helper from eth-sig-util to extract the address from the signature
+		const msgBufferHex = bufferToHex(Buffer.from(msg, 'utf8'));
+		const address = recoverPersonalSignature({data: msgBufferHex, sig: signature.signature});
+        console.log("the address is", msg);
 
                 
 
-	// 			// The signature verification is successful if the address found with
-	// 			// sigUtil.recoverPersonalSignature matches the initial publicAddress
-    //     // console.log("the address is",publicAddress);
-	// 	if (address.toLowerCase() === publicAddress.toLowerCase()) {
+				// The signature verification is successful if the address found with
+				// sigUtil.recoverPersonalSignature matches the initial publicAddress
+        // console.log("the address is",publicAddress);
+		if (address.toLowerCase() === publicAddress.toLowerCase()) {
 
+            response.status(200).json({ 
+                success: true,
+               
+            })
             
-	// 		const user = await User.create({
-    //             nonce, publicAddress, username, email, password
-    //         })
+			// const user = await User.create({
+            //     nonce, publicAddress, username, email, password
+            // })
 
-    //         user.nonce =Math.floor(Math.random() * 10000);
-    //         user.save();
-    //         sendToken(user, 200, response);
+            // user.nonce =Math.floor(Math.random() * 10000);
+            // user.save();
+            // sendToken(user, 200, response);
             
-	// 	} else {
-	// 		res.status(401).send({
-	// 			error: 'Signature verification failed',
-	// 		});
+		} else {
+			res.status(401).send({
+				error: 'Signature verification failed',
+			});
 
-	// 		// return null;
-	// 	}
+			// return null;
+		}
 
-    // } catch (err) {
+    } catch (err) {
 
-    //     next(err.subject);
-    // }
-
-    response.status(200).json({ 
-        success: true,
-    
-    })
+        next(err.subject);
+    }
     
 }
 
