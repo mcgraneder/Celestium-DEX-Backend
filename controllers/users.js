@@ -1,4 +1,4 @@
-const User = require("../models/Users")
+const Users = require("../models/Users")
 const { response } = require("express");
 const errorResponse = require("../utils/errorResponse");
 const ErrorResponse = require("../utils/errorResponse");
@@ -12,7 +12,7 @@ exports.getUserData = async (request, response, next) => {
     //     success: true,
     //     data: "you got access to the private data in this route"
     // })
-    await User.find({}).then((data) => {
+    await Users.find({}).then((data) => {
 
         console.log("Data", data)
         response.send(data)
@@ -29,7 +29,7 @@ exports.FindAddress = async (request, response, next) => {
     console.log(publicAddress)
     console.log(publicAddress)
     publicAddress = publicAddress.toLowerCase()
-    const found = await User.findOne({ publicAddress });
+    const found = await Users.findOne({ publicAddress });
     console.log(found)
     if (found) {
 
@@ -53,14 +53,14 @@ exports.FindAddress = async (request, response, next) => {
         return next(new errorResponse("Password needs to be 6 characters", 400, 1));
     }
 
-    const user1 = await User.findOne({ username });
+    const user1 = await Users.findOne({ username });
 
     if (user1) {
 
         return next(new errorResponse("Username already taken", 401, 2));
     }
 
-    const user2 = await User.findOne({ email });
+    const user2 = await Users.findOne({ email });
 
     if (user2) {
 
@@ -82,7 +82,7 @@ exports.getUserNonce = async (request, response, next) => {
     var { publicAddress, email, password } = request.body;
     
     publicAddress = publicAddress.toLowerCase()
-    const found = await User.findOne({ publicAddress });
+    const found = await Users.findOne({ publicAddress });
 
     console.log("adddddd", found)
     
@@ -91,7 +91,7 @@ exports.getUserNonce = async (request, response, next) => {
         return next(new errorResponse("Wallet address not registered. Please Sign Up", 400, 1));
     }
 
-    const user = await User.findOne({ email }).select("+password");
+    const user = await Users.findOne({ email }).select("+password");
 
         if (!user) {
 
@@ -107,7 +107,7 @@ exports.getUserNonce = async (request, response, next) => {
 
         }
 
-        const user4 = await User.findOne({ publicAddress });
+        const user4 = await Users.findOne({ publicAddress });
 
         console.log("user 3 is", user4)
        
@@ -134,7 +134,7 @@ exports.getUser = async (request, response, next) => {
     var { publicAddress } = request.body;
     
     // publicAddress = publicAddress.toLowerCase()
-    const found = await User.findOne({ publicAddress});
+    const found = await Users.findOne({ publicAddress});
 
     console.log("adddddd", found.publicAddress, publicAddress)
     
@@ -161,7 +161,7 @@ exports.getUserAddress = async (request, response, next) => {
     var { publicAddress } = request.body;
     
     publicAddress = publicAddress.toLowerCase()
-    await User.findOne({publicAddress}).then((data, err) => {
+    await Users.findOne({publicAddress}).then((data, err) => {
 
         if (data == null) {
 
@@ -185,7 +185,7 @@ exports.updateUserAddress = async(request, response, next) => {
     // var email = "mcgrane480@gmail.com"
     // var publicAddress = "0x3330e78dD15784e0DEc11146b5238F8C21043fea"
     publicAddress = publicAddress.toLowerCase()
-    const user = await User.findOne({ email });
+    const user = await Users.findOne({ email });
     console.log(user)
     try {
 
@@ -227,7 +227,7 @@ exports.getNonce = async (request, response, next) => {
 
     const { email } = request.body;
 
-    await User.findOne({email}).then((data) => {
+    await Users.findOne({email}).then((data) => {
 
         console.log("Data", data)
         response.status(200).json({ 

@@ -1,5 +1,5 @@
 const { response } = require("express");
-const User = require("../models/Users");
+const Users = require("../models/Users");
 const errorResponse = require("../utils/errorResponse");
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
@@ -43,7 +43,7 @@ exports.register = async (request, response, next) => {
 		if (address.toLowerCase() === publicAddress.toLowerCase()) {
 
             
-			const user = await User.create({
+			const user = await Users.create({
                 nonce, publicAddress, username, email, password
             })
 
@@ -54,7 +54,7 @@ exports.register = async (request, response, next) => {
 		} else {
 			res.status(401).send({
 				error: 'Signature verification failed',
-			});
+			});s
 
 			// return null;
 		}
@@ -123,7 +123,7 @@ exports.forgotPassword = async (request, response, next) => {
 
     try {
 
-        const user = await User.findOne({ email });
+        const user = await Users.findOne({ email });
 
         if (!user) {
 
@@ -183,7 +183,7 @@ exports.resetPassword = async (request, response, next) => {
     console.log(resetPasswordToken)
     try {
 
-        const user = await User.findOne({
+        const user = await Users.findOne({
 
             resetPasswordToken,
             // resetPasswordExpire: { $gt: Date.now() }
