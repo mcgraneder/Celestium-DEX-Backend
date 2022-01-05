@@ -43,9 +43,9 @@ exports.register = async (request, response, next) => {
 		if (address.toLowerCase() === publicAddress.toLowerCase()) {
 
             
-			// const user = await Users.create({
-            //     nonce, publicAddress, username, email, password
-            // })
+			const user = await Users.create({
+                nonce, publicAddress, username, email, password
+            })
 
             // user.nonce =Math.floor(Math.random() * 10000);
             // user.save();
