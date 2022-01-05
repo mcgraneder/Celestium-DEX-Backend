@@ -43,13 +43,16 @@ exports.register = async (request, response, next) => {
 		if (address.toLowerCase() === publicAddress.toLowerCase()) {
 
             
-			const user = await Users.create({
-                nonce, publicAddress, username, email, password
-            })
+			// const user = await Users.create({
+            //     nonce, publicAddress, username, email, password
+            // })
 
-            user.nonce =Math.floor(Math.random() * 10000);
-            user.save();
-            sendToken(user, 200, response);
+            // user.nonce =Math.floor(Math.random() * 10000);
+            // user.save();
+            // sendToken(user, 200, response);
+            response.status(200).json({ 
+                success: true
+            })
             
 		} else {
 			res.status(401).send({
@@ -71,7 +74,7 @@ exports.login = async (request, response, next) => {
     const { signature, nonce, publicAddress, email, password } = request.body;
     console.log("my nonnnceee is", nonce)
 
-    const user = await User.findOne({ email }).select("+password");
+    const user = await Users.findOne({ email }).select("+password");
     if (!email || !password) {
 
         return next(new errorResponse("Please provide an email and password", 400, 3));
