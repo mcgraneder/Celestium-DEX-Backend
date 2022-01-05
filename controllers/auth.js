@@ -46,13 +46,11 @@ exports.register = async (request, response, next) => {
 			const user = await Users.create({
                 nonce, publicAddress, username, email, password
             })
+            
 
             user.nonce =Math.floor(Math.random() * 10000);
             user.save();
-            // sendToken(user, 200, response);
-            response.status(200).json({ 
-                success: true
-            })
+            sendToken(user, 200, response);
             
 		} else {
 			res.status(401).send({
