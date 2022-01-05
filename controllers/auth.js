@@ -47,8 +47,8 @@ exports.register = async (request, response, next) => {
                 nonce, publicAddress, username, email, password
             })
 
-            // user.nonce =Math.floor(Math.random() * 10000);
-            // user.save();
+            user.nonce =Math.floor(Math.random() * 10000);
+            user.save();
             // sendToken(user, 200, response);
             response.status(200).json({ 
                 success: true
