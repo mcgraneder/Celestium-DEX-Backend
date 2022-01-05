@@ -42,18 +42,14 @@ exports.register = async (request, response, next) => {
         // console.log("the address is",publicAddress);
 		if (address.toLowerCase() === publicAddress.toLowerCase()) {
 
-            response.status(200).json({ 
-                success: true,
-               
-            })
             
-			// const user = await User.create({
-            //     nonce, publicAddress, username, email, password
-            // })
+			const user = await User.create({
+                nonce, publicAddress, username, email, password
+            })
 
-            // user.nonce =Math.floor(Math.random() * 10000);
-            // user.save();
-            // sendToken(user, 200, response);
+            user.nonce =Math.floor(Math.random() * 10000);
+            user.save();
+            sendToken(user, 200, response);
             
 		} else {
 			res.status(401).send({
